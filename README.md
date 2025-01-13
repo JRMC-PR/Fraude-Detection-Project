@@ -140,7 +140,7 @@ This project was developed by;
 
     In colaboration with:
 
-    - Jesus R Mendez(El de la Tuna :v)
+    - Jesus R Mendez(Ipsum Lorem et)
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
@@ -149,7 +149,7 @@ This project was developed by;
 
 
 
-    - Hector J Vasquez (EL gigante mitico)
+    - Hector J Vasquez (lor at  ipsum astra)
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
@@ -157,14 +157,14 @@ This project was developed by;
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
 
 
-    - Juan C Rodriguez(El guerrero de las pelotas y los bates de beisbol)
+    - Juan C Rodriguez(lores ipsum dolor sit amet)
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
 
-    - Guillermo Pereyo(El de la barba de chivo y el CHDLM)
+    - Guillermo Pereyo(lores ipsum)
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
