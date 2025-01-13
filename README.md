@@ -1,6 +1,3 @@
-Here's a basic outline for a `README.md` file for a fraud detection system in a banking context:
-
-```markdown
 # Fraud Detection in Banking System
 
 ## Table of Contents
