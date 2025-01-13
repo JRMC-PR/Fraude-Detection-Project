@@ -135,25 +135,16 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Authors Information
 This project was developed by;
 
-    Juan R. Silva, a Data Scientist, Software Developer, Student at Holberton Coding School.
+    - Juan R. Silva, a Data Scientist, Software Developer, Student at Holberton Coding School.
 
-    ### Contact
+   ### Contact
 - **Email**: [juansilva.dvm@gmail.com](mailto:juansilva.dvm@gmail.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/juan-silva-rubio)
 - **GitHub**: [github.com/yourusername](https://github.com/Mizuinu30)
 
-In colaboration with
+    In colaboration with:
 
-    -Jesus R Mendez(El de la Tuna :v)
-
-    ### Contact
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
-
-
-
-    -Hector J Vasquez (EL gigante mitico)
+    - Jesus R Mendez(El de la Tuna :v)
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
@@ -161,14 +152,23 @@ In colaboration with
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
 
 
-    -Juan C Rodriguez(El guerrero de las pelotas y los bates de beisbol)
+
+    - Hector J Vasquez (EL gigante mitico)
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
 
-    -Guillermo Pereyo(El de la barba de chivo y el CHDLM)
+
+    - Juan C Rodriguez(El guerrero de las pelotas y los bates de beisbol)
+
+    ### Contact
+- **Email**: [your-email@example.com](mailto:your-email@example.com)
+- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
+- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+
+    - Guillermo Pereyo(El de la barba de chivo y el CHDLM)
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
