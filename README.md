@@ -141,28 +141,28 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - **Email**: [juansilva.dvm@gmail.com](mailto:juansilva.dvm@gmail.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/juan-silva-rubio)
 - **GitHub**: [github.com/yourusername](https://github.com/Mizuinu30)
-```
+
 In colaboration with
 
     -Jesus R Mendez
-```
+
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
 
-```
+
 
     -Hector J Vasquez
-```
+
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
-```
+
 
     -Juan C Rodriguez
-```
+
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
@@ -173,8 +173,5 @@ In colaboration with
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 - **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
 - **GitHub**: [github.com/yourusername](https://github.com/yourusername)
-
-
-```
 
 ```
