@@ -131,7 +131,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Authors Information
 This project was developed by;
 
-    - Juan R. Silva, a Data Scientist, Software Developer, Student at Holberton Coding School.
+- Juan R. Silva, a Data Scientist, Software Developer, Student at Holberton Coding School.
 
    ### Contact
 - **Email**: [juansilva.dvm@gmail.com](mailto:juansilva.dvm@gmail.com)
