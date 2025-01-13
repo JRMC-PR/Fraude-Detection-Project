@@ -135,8 +135,8 @@ This project was developed by;
 
    ### Contact
 - **Email**: [juansilva.dvm@gmail.com](mailto:juansilva.dvm@gmail.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/juan-silva-rubio)
-- **GitHub**: [github.com/yourusername](https://github.com/Mizuinu30)
+- **LinkedIn**: [linkedin.com/in/juan-silva-rubio)](https://linkedin.com/in/juan-silva-rubio)
+- **GitHub**: [github.com/Mizuinu30](https://github.com/Mizuinu30)
 
     In colaboration with:
 
