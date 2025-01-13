@@ -17,12 +17,12 @@ Here's a basic outline for a `README.md` file for a fraud detection system in a 
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
----
+
 
 ## Introduction
 Fraud detection in banking is crucial for protecting customer assets and maintaining the trustworthiness of financial institutions. This project leverages machine learning techniques to identify potentially fraudulent transactions in real time.
 
----
+
 
 ## Features
 - Real-time transaction monitoring
@@ -30,7 +30,7 @@ Fraud detection in banking is crucial for protecting customer assets and maintai
 - Model performance evaluation with metrics like precision, recall, and F1-score
 - Visualization of key insights and transaction patterns
 
----
+
 
 ## Technologies Used
 - **Programming Language**: Python
@@ -39,7 +39,7 @@ Fraud detection in banking is crucial for protecting customer assets and maintai
 - **Visualization**: Tableau, Power BI, or Python-based tools
 - **Framework**: Flask/Django for web deployment (optional)
 
----
+
 
 ## Installation
 1. Clone the repository:
@@ -57,7 +57,7 @@ Fraud detection in banking is crucial for protecting customer assets and maintai
 4. Set up the database:
    - Import the provided SQL schema or setup instructions from the `/database` folder.
 
----
+
 
 ## Usage
 1. Run the pre-processing script to prepare the data:
@@ -77,7 +77,7 @@ Fraud detection in banking is crucial for protecting customer assets and maintai
    python app.py
    ```
 
----
+
 
 ## Data
 The dataset includes information on financial transactions, including:
@@ -89,14 +89,14 @@ The dataset includes information on financial transactions, including:
 
 *Note*: Ensure data privacy by anonymizing sensitive information and adhering to GDPR or other relevant regulations.
 
----
+
 
 ## Model Description
 - **Algorithm**: Random Forest, Gradient Boosting, Neural Networks, or a combination
 - **Feature Engineering**: Statistical analysis, feature scaling, and encoding
 - **Pipeline**: Data preprocessing → Feature extraction → Model training → Evaluation
 
----
+
 
 ## Evaluation Metrics
 - **Accuracy**
@@ -105,7 +105,6 @@ The dataset includes information on financial transactions, including:
 - **F1-score**
 - **ROC-AUC**
 
----
 
 ## Results
 Include a summary of the results:
@@ -113,25 +112,22 @@ Include a summary of the results:
 - ROC curve
 - Performance metrics comparison
 
----
 
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request for review.
 
----
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
 
 ## Acknowledgements
 - [Kaggle](https://www.kaggle.com/) for the datasets
 - Open-source contributors for libraries and frameworks
 - Mentors and colleagues for guidance
-```
 
-```
+
+
 ## Authors Information
 This project was developed by;
 
