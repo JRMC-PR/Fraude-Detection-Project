@@ -1,3 +1,5 @@
+#!usr/bin/env python3
+
 import random
 import pandas as pd
 from faker import Faker
