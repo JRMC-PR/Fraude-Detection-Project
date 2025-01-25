@@ -1,4 +1,4 @@
-#!bin/usr/env python 3
+#!/usr/bin/env python3
 """  """
 
 import random
@@ -8,7 +8,7 @@ from faker import Faker
 fake = Faker()
 
 # Number of users
-num_users = random.randint(85000)
+num_users = random.randint(0,85000)
 
 # Number of rows
 num_rows = 1000000
