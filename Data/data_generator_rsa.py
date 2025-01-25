@@ -1,5 +1,9 @@
 #!usr/bin/env python3
-
+'''script that generates a dummy csv file with random data for loginsRSA
+    Hardcoded event types, countries, cities, and timezones for the purpose of this script
+    in real data generation it would not be random but repetitive
+    the script generates a csv file with 100 rows of random data for test, before running the script change to the inteded amount of rows
+'''
 import random
 import pandas as pd
 from faker import Faker
@@ -9,6 +13,7 @@ fake = Faker()
 # Number of users
 num_users = random.randint(80000, 85000)
 
+# list for all types of events
 EVENT_TYPE = [
     "PIN_REQUEST_CC_SUCCESS",
     "AA_SIGNATURE_PLUS_ACCEPT_TC",
@@ -258,12 +263,14 @@ EVENT_TYPE = [
     "WIDGET"
 ]
 
+# Mapping of countries to cities
 country_city_map = {
     'pr': ['San Juan', 'Bayamon', 'Carolina', 'Ponce', 'Caguas', 'Aguadilla', 'Mayaguez', 'Ponce', 'Guaynabo'],
     'us': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'],
     'vi': ['Charlotte Amalie', 'Christiansted', 'Frederiksted', 'Cruz Bay', 'Hansen Bay', 'Sandy Point', 'St. Thomas', 'St. John', 'St. Croix', 'Lovango Cay']
 }
 
+# Mapping of countries to timezones
 timezone_map = {
     'pr': "-4.0",
     'vi': "-4.0",
@@ -275,8 +282,8 @@ timezone_map = {
 def format_date(date):
     return date.strftime("%d%b%Y:%H:%M:%S").upper()
 
-# Number of rows
-num_rows = 1000000
+# Number of rows to be created, changed for testing purposes
+num_rows = 100
 
 # Generate user data
 users = [fake.user_name() for _ in range(num_users)]
