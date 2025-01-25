@@ -7,7 +7,7 @@ from faker import Faker
 fake = Faker()
 
 # Number of users
-num_users = random.randint(75000, 85000)
+num_users = random.randint(80000, 85000)
 
 EVENT_TYPE = [
     "PIN_REQUEST_CC_SUCCESS",
