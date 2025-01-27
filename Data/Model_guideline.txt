@@ -1,0 +1,121 @@
+Build a Python-based machine learning pipeline using an IsolationForest model to detect brute force attacks on user accounts. The pipeline should process data from a `.csv` file with the following columns:
+- REPORT_DATE
+- USER_ID
+- USER_NAME
+- TIMEZONE
+- IP_ADDRESS
+- IP_COUNTRY
+- IP_CITY
+- EVENT_TYPE
+
+The pipeline must handle the following use cases (detection flags) and output results as described below:
+
+---
+
+### **Detection Flags and Requirements**
+1. **Flag 1: Detect multiple login attempts with variations in the username**
+   - If multiple login attempts are made using the same username but with numerical variations (e.g., `john123`, `john124`), flag it.
+   - If the `EVENT_TYPE` column in the last attempt of these variations indicates a successful login, **print the row** and save it to a file named `Fraud_<REPORT_DATE>.csv`.
+
+2. **Flag 2: Detect multiple users logging in from the same IP address in a short timeframe**
+   - Monitor if **multiple users** try to log in from the same IP address within a short timeframe (e.g., 1 minute).
+   - If the `EVENT_TYPE` column in the last attempt shows a successful login, **print the row** and save it to a file named `Fraud_<REPORT_DATE>.csv`.
+
+3. **Flag 3: Detect logins outside of regular user hours**
+   - Learn and establish the **regular login hours** for each user based on historical data.
+   - Flag logins that occur **outside of these regular timeframes**.
+
+4. **Flag 4: Detect excessive login attempts by a single user in a short timeframe**
+   - If a user attempts to log in **more than 12 times within a single minute**, flag it.
+
+---
+
+### **Output Requirements**
+The output of the model should include the following components:
+1. **Fraud Detection CSVs**:
+   - For each flagged event under **Flag 1** or **Flag 2**, save the corresponding rows to a file named `Fraud_<REPORT_DATE>.csv`.
+
+2. **Summary CSV File**:
+   - After processing the data, save a summary file that contains the count of triggered flags for each user. The summary file should have the following structure:
+
+   | USR_ID | Flag_1 | Flag_2 | Flag_3 | Flag_4 | Flag_5 | Flag_6 | User_IP     | Date       |
+   |--------|--------|--------|--------|--------|--------|--------|-------------|------------|
+   | <ID>   | <Count>| <Count>| <Count>| <Count>| N/A    | N/A    | <IP_Address>| <Date>     |
+
+   - **Flag_1 to Flag_4**: These columns are filled by this model.
+   - **Flag_5, Flag_6**: These columns will remain empty (to be populated by another model).
+   - **Date**: Use the `REPORT_DATE` from the input data.
+
+3. **Log Messages**:
+   - For every flagged event, output the event details as a **log message** in the terminal for debugging and monitoring purposes.
+
+---
+
+### **Implementation Requirements**
+1. **Data Loading**:
+   - Load the `.csv` file using `pandas`.
+
+2. **Isolation Forest**:
+   - Use the IsolationForest algorithm to learn the pattern of anomalies (flags 1-4) from the input data. Combine it with rule-based logic for specific conditions (e.g., thresholds for Flags 2 and 4).
+
+3. **Custom Logic**:
+   - Implement rules for Flags 1-4. For example:
+     - For Flag 1, write a custom logic to identify username variations with numerical suffixes.
+     - For Flag 3, track login times for each user and define their "regular hours."
+
+4. **File Outputs**:
+   - Save detected fraud cases for Flags 1 and 2 in `Fraud_<REPORT_DATE>.csv`.
+   - Save the summary output in `Summary_<REPORT_DATE>.csv`.
+
+5. **Time Zones**:
+   - Use the `TIMEZONE` column to ensure accurate detection of login hours for Flag 3. Convert all timestamps to a common timezone (e.g., UTC) for uniformity.
+
+6. **Performance**:
+   - Ensure that the model and logic are efficient, capable of processing large datasets with millions of rows.
+
+---
+
+### **Example Input Data (CSV)**
+| REPORT_DATE | USER_ID | USER_NAME | TIMEZONE  | IP_ADDRESS   | IP_COUNTRY | IP_CITY   | EVENT_TYPE       |
+|-------------|---------|-----------|-----------|--------------|------------|-----------|------------------|
+| 2025-01-23  | 1001    | john123   | UTC       | 192.168.1.1  | USA        | New York  | failed_login     |
+| 2025-01-23  | 1002    | john124   | UTC       | 192.168.1.1  | USA        | New York  | failed_login     |
+| 2025-01-23  | 1003    | alice     | UTC       | 192.168.1.2  | USA        | Boston    | successful_login |
+| 2025-01-23  | 1004    | john      | UTC       | 192.168.1.1  | USA        | New York  | failed_login     |
+| 2025-01-23  | 1001    | john      | UTC       | 192.168.1.1  | USA        | New York  | successful_login |
+
+---
+
+### **Expected Output Example**
+1. **Fraud_<REPORT_DATE>.csv**
+For the input data above, `Fraud_2025-01-23.csv` might contain:
+
+| REPORT_DATE | USER_ID | USER_NAME | TIMEZONE  | IP_ADDRESS   | IP_COUNTRY | IP_CITY   | EVENT_TYPE       |
+|-------------|---------|-----------|-----------|--------------|------------|-----------|------------------|
+| 2025-01-23  | 1001    | john123   | UTC       | 192.168.1.1  | USA        | New York  | successful_login |
+
+2. **Summary_<REPORT_DATE>.csv**
+For the input data above, `Summary_2025-01-23.csv` might contain:
+
+| USR_ID | Flag_1 | Flag_2 | Flag_3 | Flag_4 | Flag_5 | Flag_6 | User_IP     | Date       |
+|--------|--------|--------|--------|--------|--------|--------|-------------|------------|
+| 1001   | 1      | 1      | 0      | 0      |        |        | 192.168.1.1 | 2025-01-23 |
+| 1002   | 0      | 0      | 0      | 0      |        |        |             | 2025-01-23 |
+| 1003   | 0      | 0      | 0      | 0      |        |        | 192.168.1.2 | 2025-01-23 |
+
+---
+
+### **Libraries to Use**
+1. `pandas`: For data manipulation and preprocessing.
+2. `scikit-learn`: For the IsolationForest model.
+3. `datetime`: For handling timestamps and time zones.
+4. `numpy`: For efficient array operations.
+
+---
+
+### **Deliverables**
+- A Python script that implements the above logic.
+- Outputs:
+  1. `Fraud_<REPORT_DATE>.csv`: Rows flagged as suspicious for Flags 1 and 2.
+  2. `Summary_<REPORT_DATE>.csv`: Summary counts for Flags 1-4.
+- Log messages printed in the terminal during execution.
