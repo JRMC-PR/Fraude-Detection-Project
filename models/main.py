@@ -4,6 +4,9 @@ import time
 import pyfiglet
 import traceback  # For full error trace
 from model import run_fraud_detection  # Import the function from model.py
+import pickle
+from history_model_V2 import build_user_history
+
 
 # Function to display welcome message
 def display_welcome():
@@ -13,8 +16,28 @@ def display_welcome():
 # Function to display menu options
 def display_menu():
     print("\nOptions:")
-    print("1. Run Fraud Detection Model")
+    print("1. Run Fraud Detection Model for numerica values")
+    print("2. Show Users With Less Than 3 Entries")
     print("0. Exit")
+
+
+def show_skipped_users():
+    """Load and display all skipped users along with their stored history."""
+    SKIPPED_USERS_FILE = "skipped_users.pkl"
+
+    # Load skipped users
+    skipped_users = pickle.load_pickle(SKIPPED_USERS_FILE)
+
+    # Check if there are any skipped users
+    if not skipped_users:
+        print("✅ No skipped users! All users have enough data.")
+        return
+
+    print("\n📌 Skipped Users and Their Stored Data:")
+    for user_id, data in skipped_users.items():
+        record_count = len(data["history_data"])
+        print(f"  - User ID: {user_id} | Total Records: {record_count}")
+        print(data["history_data"].head(), "\n")  # Show first few records
 
 # Main function
 def main():
@@ -75,17 +98,12 @@ def main():
             time.sleep(2)
 
             try:
-                run_fraud_detection()  # Call the model function
+                build_user_history(AUTH_PATH)  # Call the model function
                 print("\nDetection complete! Check REPORT.csv for results.\n")
 
             except ValueError as e:
                 print("\n❌ **Data Processing Error** ❌")
-                print(f"   → {str(e)}")
-                print("\n📌 Possible Causes:")
-                print("   - A non-numeric value was found where a number was expected.")
-                print("   - Check if 'DATA_S_1' or 'DATA_S_4' contains text instead of numbers.")
-                print("   - Ensure CSV formatting is correct.\n")
-
+                print(f"   → {str(e)}\n")
                 print("🔎 **Full Error Details:**")
                 traceback.print_exc()  # Print full traceback
 
@@ -93,7 +111,7 @@ def main():
                 print("\n❌ **Missing File Error** ❌")
                 print(f"   → {str(e)}")
                 print("\n📌 Solution:")
-                print("   - Ensure `user_activity.csv` is present in the script's directory.")
+                print(f"   - Ensure `{RSA_FILE}` is present in correect folder {RSA_PATH} directory.")
                 print("   - Check if the filename is spelled correctly.\n")
 
                 print("🔎 **Full Error Details:**")
@@ -108,6 +126,8 @@ def main():
         elif choice == "0":
             print("\nExiting... Goodbye!")
             break
+        elif choice == "2":
+            show_skipped_users()
         else:
             print("\nInvalid choice. Please enter 1 or 0.")
 
