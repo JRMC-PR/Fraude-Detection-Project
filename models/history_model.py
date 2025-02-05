@@ -13,66 +13,47 @@ MONTH_MAP = {
 }
 
 def parse_event_time(event_time):
-    """Converts 'DDMMMYYYY:HH:MM:SS' format to 'DDMMYYYYHH:MM:SS'."""
+    """Ensures EVENT_TIME remains in 'DDMMMYYYY:HH:MM:SS' format."""
     try:
-        day = event_time[:2]
-        month_abbr = event_time[2:5].upper()  # Extract month abbreviation
-        year = event_time[5:9]
-        time_part = event_time[10:]  # Extract HH:MM:SS
-
-        if month_abbr in MONTH_MAP:
-            month_numeric = MONTH_MAP[month_abbr]
-            return f"{day}{month_numeric}{year}{time_part}"
+        # Validate format
+        if len(event_time) >= 15:
+            return event_time  # Keep original format
         else:
-            raise ValueError(f"Invalid month abbreviation: {month_abbr}")
-
+            raise ValueError("Incorrect event time format")
     except Exception as e:
         print(f"❌ Error processing time {event_time}: {e}")
-        return None  # Return None if conversion fails
-
-def adjust_event_time(event_time, timezone_offset):
-    """Adjusts EVENT_TIME based on TIMEZONE offset."""
-    try:
-        dt = datetime.strptime(event_time, "%d%m%Y%H:%M:%S")
-        dt = dt - timedelta(hours=timezone_offset)  # Adjust timezone
-        return dt.strftime("%d%m%Y%H:%M:%S")
-    except Exception as e:
-        print(f"❌ Error adjusting time {event_time}: {e}")
-        return event_time  # Return original if error occurs
+        return None
 
 def build_user_history(csv_path):
-    """Builds user history using HMM & LSTM while handling sparse data issues."""
+    """Builds user history with correctly formatted fields."""
 
     # Load CSV data
     df = pd.read_csv(csv_path)
 
     # Select relevant columns
-    features = ['USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'TIMEZONE',
-                'EVENT_TIME', 'DATA_S_4', 'DATA_S_34', 'RISK_SCORE']
-    df = df[['USER_ID'] + features]  # Keep USER_ID as anchor
+    features = ['USER_ID', 'USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'TIMEZONE',
+                'EVENT_TIME', 'DATA_S_4', 'DATA_S_34', 'RISK_SCORE', 'EVENT_TYPE']
 
-    # Ensure TIMEZONE is numeric
-    df['TIMEZONE'] = pd.to_numeric(df['TIMEZONE'], errors='coerce').fillna(0).astype(int)
+    df = df[features]  # Keep USER_ID as anchor
 
-    # Convert EVENT_TIME from '18MAY2022:18:13:07' to '1805202218:13:07'
+    # ✅ Ensure USER_NAME is treated as a string
+    df['USER_NAME'] = df['USER_NAME'].astype(str)
+
+    # ✅ Keep IP_ADDRESS as is (do not encode it)
+    df['IP_ADDRESS'] = df['IP_ADDRESS'].astype(str)
+
+    # ✅ Ensure EVENT_TIME is kept in its original format
     df['EVENT_TIME'] = df['EVENT_TIME'].apply(parse_event_time)
 
-    # Apply timezone adjustment to EVENT_TIME
-    df['EVENT_TIME'] = df.apply(lambda row: adjust_event_time(str(row['EVENT_TIME']), row['TIMEZONE']), axis=1)
+    # ✅ Ensure DATA_S_4 is an integer (device age)
+    df['DATA_S_4'] = pd.to_numeric(df['DATA_S_4'], errors='coerce').fillna(0).astype(int)
 
-    # Convert EVENT_TIME to Unix timestamp
-    df['EVENT_TIME'] = df['EVENT_TIME'].apply(lambda x: datetime.strptime(x, "%d%m%Y%H:%M:%S").timestamp())
+    # ✅ Keep DATA_S_34 in its original form
+    df['DATA_S_34'] = df['DATA_S_34'].astype(str)
 
-    # Encode categorical data
-    label_encoders = {}
-    for col in ['USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'DATA_S_34']:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
-        label_encoders[col] = le  # Store encoders for future use
-
-    # Normalize numerical values
-    scaler = MinMaxScaler()
-    df[['EVENT_TIME', 'DATA_S_4', 'RISK_SCORE']] = scaler.fit_transform(df[['EVENT_TIME', 'DATA_S_4', 'RISK_SCORE']])
+    # Print first few records for debugging
+    print("\n📊 DEBUG: First few records after preprocessing:")
+    print(df.head())
 
     # Group data by USER_ID
     user_history = {}
@@ -80,8 +61,8 @@ def build_user_history(csv_path):
     for user_id, group in df.groupby('USER_ID'):
         group = group.drop(columns=['USER_ID'])  # Remove USER_ID column
 
-        # Convert history into a numerical sequence
-        sequence = group.to_numpy()
+        # Convert history into a numerical sequence (except categorical features)
+        sequence = group.select_dtypes(include=[np.number]).to_numpy()
 
         # Skip HMM training for users with fewer than 3 events
         if len(sequence) < 3:
@@ -127,4 +108,3 @@ def build_user_history(csv_path):
         }
 
     return user_history  # Pass to next model
-
