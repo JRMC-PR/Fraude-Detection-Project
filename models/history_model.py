@@ -1,156 +1,132 @@
 import pandas as pd
 import numpy as np
+import os
+import pickle  # For storing user history
 from datetime import datetime, timedelta
 from hmmlearn import hmm
 from tensorflow.keras.models import Sequential  #type: ignore
-from tensorflow.keras.layers import LSTM, Dense  # type: ignore
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler  # Preprocessing utilities
+from tensorflow.keras.layers import LSTM, Dense #type: ignore
 import tensorflow as tf
-tf.config.set_visible_devices([], 'GPU')  # Disable GPU, force CPU usage
 
-# Mapping of month abbreviations to numeric values for EVENT_TIME conversion
-MONTH_MAP = {
-    "JAN": "01", "FEB": "02", "MAR": "03", "APR": "04", "MAY": "05", "JUN": "06",
-    "JUL": "07", "AUG": "08", "SEP": "09", "OCT": "10", "NOV": "11", "DEC": "12"
-}
+# Disable GPU for compatibility
+tf.config.set_visible_devices([], 'GPU')
+
+# Define file to store user history
+HISTORY_FILE = "user_history.pkl"
+
+def load_user_history():
+    """Load existing user history from a pickle file, or return an empty dictionary if it doesn't exist."""
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "rb") as f:
+            return pickle.load(f)
+    return {}  # Return empty dict if no history exists
+
+def save_user_history(user_history):
+    """Save user history to a pickle file."""
+    with open(HISTORY_FILE, "wb") as f:
+        pickle.dump(user_history, f)
 
 def parse_event_time(event_time, timezone_offset=0):
-    """
-    Adjusts EVENT_TIME by subtracting the TIMEZONE value from the hour (%H).
-
-    Parameters:
-        event_time (str): Original event time in 'DDMMMYYYY:HH:MM:SS' format.
-        timezone_offset (int): The timezone offset to subtract from the event time.
-
-    Returns:
-        str: Adjusted event time in the original format 'DDMMMYYYY:HH:MM:SS'.
-    """
+    """Adjust EVENT_TIME based on the user's timezone."""
     try:
-        # Convert string to datetime object
         dt = datetime.strptime(event_time, "%d%b%Y:%H:%M:%S")
-
-        # Adjust the hour by subtracting the TIMEZONE offset
-        dt = dt + timedelta(hours=int(timezone_offset))
-
-        # Convert back to string in the original format
-        return dt.strftime("%d%b%Y:%H:%M:%S")
-
+        dt = dt + timedelta(hours=int(timezone_offset))  # Adjust for timezone
+        return dt.strftime("%d%b%Y:%H:%M:%S")  # Return adjusted time
     except Exception as e:
-        print(f"❌ Error processing time {event_time} with timezone {timezone_offset}: {e}")
+        print(f"❌ Error parsing time {event_time}: {e}")
         return event_time  # Return original if error occurs
 
 def build_user_history(csv_path):
-    """
-    Reads a CSV file and builds a historical profile for each USER_ID.
-    The model uses:
-        - Hidden Markov Models (HMM) to analyze sequential behavior patterns.
-        - Long Short-Term Memory (LSTM) networks to predict user actions.
+    """Process user data, accumulate history, and train HMM/LSTM models."""
 
-    Parameters:
-        csv_path (str): Path to the CSV file.
+    # Load existing history
+    user_history = load_user_history()
 
-    Returns:
-        dict: A dictionary with USER_IDs as keys and their processed history as values.
-    """
-
-    # Load CSV data into a pandas DataFrame
+    # Load new data
     df = pd.read_csv(csv_path)
 
-    # Select only the relevant columns needed for modeling
+    # Relevant features
     features = ['USER_ID', 'USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'TIMEZONE',
                 'EVENT_TIME', 'DATA_S_4', 'DATA_S_34', 'RISK_SCORE', 'EVENT_TYPE']
+    df = df[features]
 
-    df = df[features]  # Keep only selected features
-
-    # ✅ Ensure USER_NAME is treated as a string (important for identity tracking)
+    # Preprocess data
     df['USER_NAME'] = df['USER_NAME'].astype(str)
-
-    # ✅ Keep IP_ADDRESS as a string (do not encode it into numbers)
     df['IP_ADDRESS'] = df['IP_ADDRESS'].astype(str)
-
-    # ✅ Ensure TIMEZONE is a numeric integer (replace NaN with 0)
     df['TIMEZONE'] = pd.to_numeric(df['TIMEZONE'], errors='coerce').fillna(0).astype(int)
-
-    # ✅ Adjust EVENT_TIME by subtracting the TIMEZONE offset from the hour
     df['EVENT_TIME'] = df.apply(lambda row: parse_event_time(str(row['EVENT_TIME']), row['TIMEZONE']), axis=1)
-
-    # ✅ Ensure DATA_S_4 is an integer (device age)
     df['DATA_S_4'] = pd.to_numeric(df['DATA_S_4'], errors='coerce').fillna(0).astype(int)
-
-    # ✅ Keep DATA_S_34 in its original form (e.g., hardware ID or unique identifier)
     df['DATA_S_34'] = df['DATA_S_34'].astype(str)
 
-    # Debugging: Print first few records after preprocessing
     print("\n📊 DEBUG: First few records after preprocessing:")
     print(df.head())
 
-    # Create an empty dictionary to store user history
-    user_history = {}
-
-    # Process each user separately by grouping data based on USER_ID
+    # Process each user
     for user_id, group in df.groupby('USER_ID'):
-        group = group.drop(columns=['USER_ID'])  # Remove USER_ID from the data (anchor already known)
+        group = group.drop(columns=['USER_ID'])  # Remove USER_ID from the dataframe
 
-        # Convert history into a numerical sequence (excluding categorical features)
+        # If user exists in history, append new data
+        if user_id in user_history:
+            prev_data = user_history[user_id]["history_data"]
+            group = pd.concat([prev_data, group])  # Append new records
+
+        # Convert to numerical sequences
         sequence = group.select_dtypes(include=[np.number]).to_numpy()
 
-        # Skip HMM training if the user has fewer than 3 login records (not enough data to model behavior)
-        # if len(sequence) < 3:
-        #     print(f"⚠️ Skipping HMM training for {user_id} (Not enough data: {len(sequence)} records)")
-        #     user_history[user_id] = {
-        #         "hmm_model": None,  # No HMM model for this user due to lack of data
-        #         "lstm_model": None,  # No LSTM model either
-        #         "history_data": group,  # Store historical login data
-        #         "hidden_states": [-1] * len(sequence)  # Default state for sparse users
-        #     }
-        #     continue  # Skip further processing for this user
+        # Skip users with fewer than 3 total records
+        if len(sequence) < 3:
+            print(f"⚠️ Skipping {user_id} (Only {len(sequence)} records, waiting for more data...)")
+            user_history[user_id] = {
+                "hmm_model": None,
+                "lstm_model": None,
+                "history_data": group,  # Store history for future runs
+                "hidden_states": [-1] * len(sequence)
+            }
+            continue  # Skip training for now
 
-    # Ensure HMM is always trained, even for users with very few data points
-    n_components = min(len(sequence), 3)  # If user has <3 records, adjust the number of states
+        # Train HMM Model
+        n_components = min(len(sequence), 3)  # Adjust the number of states
+        hmm_model = hmm.GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=100)
+        hmm_model.fit(sequence)
 
-    # Train HMM Model with dynamic n_components
-    hmm_model = hmm.GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=100)
-    hmm_model.fit(sequence)  # Train the HMM on login data
+        # Fix transition matrix if needed
+        if not hasattr(hmm_model, "transmat_") or np.any(hmm_model.transmat_ == 0):
+            print(f"⚠️ Fixing transition matrix for {user_id}")
+            hmm_model.transmat_ = np.full((n_components, n_components), 1.0 / n_components)
 
-    # ✅ Fix transition matrix if it's invalid (must sum to 1)
-    if not hasattr(hmm_model, "transmat_") or np.any(hmm_model.transmat_ == 0):
-        print(f"⚠️ Fixing transition matrix for {user_id}")
-        hmm_model.transmat_ = np.full((n_components, n_components), 1.0 / n_components)
+        hidden_states = hmm_model.predict(sequence)
 
-    # Predict hidden states after ensuring the transition matrix is valid
-    hidden_states = hmm_model.predict(sequence)  # Predict state transitions
+        # Prepare data for LSTM
+        X = sequence[:-1]  # Inputs
+        y = sequence[1:]   # Outputs
 
-    # Prepare data for LSTM model (shifted sequential input/output)
-    X = sequence[:-1]  # Inputs (all but last record)
-    y = sequence[1:]   # Outputs (shifted by one step)
+        X = X.reshape((X.shape[0], X.shape[1], 1))  # Reshape for LSTM
+        y = y.reshape((y.shape[0], y.shape[1]))
 
-    # Reshape data to match LSTM input format (samples, time steps, features)
-    X = X.reshape((X.shape[0], X.shape[1], 1))
-    y = y.reshape((y.shape[0], y.shape[1]))
+        # Define LSTM model
+        lstm_model = Sequential([
+            LSTM(64, return_sequences=True, input_shape=(X.shape[1], 1)),
+            LSTM(32, return_sequences=False),
+            Dense(y.shape[1])
+        ])
+        lstm_model.compile(optimizer='adam', loss='mse')
 
-    # Define the LSTM model for sequential pattern prediction
-    lstm_model = Sequential([
-        LSTM(64, return_sequences=True, input_shape=(X.shape[1], 1)),  # First LSTM layer
-        LSTM(32, return_sequences=False),  # Second LSTM layer
-        Dense(y.shape[1])  # Fully connected output layer (same shape as target)
-    ])
+        # Train only if data is sufficient
+        if len(X) > 0 and len(y) > 0:
+            lstm_model.fit(X, y, epochs=15, batch_size=1, verbose=1)
+        else:
+            print(f"⚠️ Skipping LSTM training for {user_id} (Not enough data)")
+            lstm_model = None
 
-    lstm_model.compile(optimizer='adam', loss='mse')  # Compile the model with Mean Squared Error loss
+        # Save trained models and history
+        user_history[user_id] = {
+            "hmm_model": hmm_model,
+            "lstm_model": lstm_model,
+            "history_data": group,  # Save complete history
+            "hidden_states": hidden_states
+        }
 
-    # ✅ Ensure at least 1 training step exists before fitting
-    if len(X) > 0 and len(y) > 0:
-        lstm_model.fit(X, y, epochs=15, batch_size=1, verbose=1)
-    else:
-        print(f"⚠️ Skipping LSTM training for {user_id} (Not enough training samples)")
-        lstm_model = None  # Avoid training on empty data
+    # Save updated history
+    save_user_history(user_history)
 
-    # Store trained models & history for this user
-    user_history[user_id] = {
-        "hmm_model": hmm_model,  # Store trained HMM model
-        "lstm_model": lstm_model,  # Store trained LSTM model
-        "history_data": group,  # Store user's login data
-        "hidden_states": hidden_states  # Store predicted HMM states
-    }
-
-    return user_history  # Pass user history to the next model in the pipeline
-
+    return user_history
