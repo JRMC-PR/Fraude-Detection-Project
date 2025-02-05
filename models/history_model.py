@@ -5,6 +5,8 @@ from hmmlearn import hmm
 from tensorflow.keras.models import Sequential  #type: ignore
 from tensorflow.keras.layers import LSTM, Dense  # type: ignore
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler  # Preprocessing utilities
+import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')  # Disable GPU, force CPU usage
 
 # Mapping of month abbreviations to numeric values for EVENT_TIME conversion
 MONTH_MAP = {
@@ -93,48 +95,62 @@ def build_user_history(csv_path):
         sequence = group.select_dtypes(include=[np.number]).to_numpy()
 
         # Skip HMM training if the user has fewer than 3 login records (not enough data to model behavior)
-        if len(sequence) < 3:
-            print(f"⚠️ Skipping HMM training for {user_id} (Not enough data: {len(sequence)} records)")
-            user_history[user_id] = {
-                "hmm_model": None,  # No HMM model for this user due to lack of data
-                "lstm_model": None,  # No LSTM model either
-                "history_data": group,  # Store historical login data
-                "hidden_states": [-1] * len(sequence)  # Default state for sparse users
-            }
-            continue  # Skip further processing for this user
+        # if len(sequence) < 3:
+        #     print(f"⚠️ Skipping HMM training for {user_id} (Not enough data: {len(sequence)} records)")
+        #     user_history[user_id] = {
+        #         "hmm_model": None,  # No HMM model for this user due to lack of data
+        #         "lstm_model": None,  # No LSTM model either
+        #         "history_data": group,  # Store historical login data
+        #         "hidden_states": [-1] * len(sequence)  # Default state for sparse users
+        #     }
+        #     continue  # Skip further processing for this user
 
-        # Train Hidden Markov Model (HMM) to model user behavior
-        hmm_model = hmm.GaussianHMM(n_components=min(3, len(sequence)), covariance_type="diag", n_iter=100)
-        hmm_model.fit(sequence)  # Train the HMM on login data
-        hidden_states = hmm_model.predict(sequence)  # Predict state transitions
+    # Ensure HMM is always trained, even for users with very few data points
+    n_components = min(len(sequence), 3)  # If user has <3 records, adjust the number of states
 
-        # Prepare data for LSTM model (shifted sequential input/output)
-        X = sequence[:-1]  # Inputs (all but last record)
-        y = sequence[1:]   # Outputs (shifted by one step)
+    # Train HMM Model with dynamic n_components
+    hmm_model = hmm.GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=100)
+    hmm_model.fit(sequence)  # Train the HMM on login data
 
-        # Reshape data to match LSTM input format (samples, time steps, features)
-        X = X.reshape((X.shape[0], X.shape[1], 1))
-        y = y.reshape((y.shape[0], y.shape[1]))
+    # ✅ Fix transition matrix if it's invalid (must sum to 1)
+    if not hasattr(hmm_model, "transmat_") or np.any(hmm_model.transmat_ == 0):
+        print(f"⚠️ Fixing transition matrix for {user_id}")
+        hmm_model.transmat_ = np.full((n_components, n_components), 1.0 / n_components)
 
-        # Define the LSTM model for sequential pattern prediction
-        lstm_model = Sequential([
-            LSTM(64, return_sequences=True, input_shape=(X.shape[1], 1)),  # First LSTM layer
-            LSTM(32, return_sequences=False),  # Second LSTM layer
-            Dense(y.shape[1])  # Fully connected output layer (same shape as target)
-        ])
+    # Predict hidden states after ensuring the transition matrix is valid
+    hidden_states = hmm_model.predict(sequence)  # Predict state transitions
 
-        lstm_model.compile(optimizer='adam', loss='mse')  # Compile the model with Mean Squared Error loss
+    # Prepare data for LSTM model (shifted sequential input/output)
+    X = sequence[:-1]  # Inputs (all but last record)
+    y = sequence[1:]   # Outputs (shifted by one step)
 
-        # Train LSTM model (predicts the next login event based on past behavior)
+    # Reshape data to match LSTM input format (samples, time steps, features)
+    X = X.reshape((X.shape[0], X.shape[1], 1))
+    y = y.reshape((y.shape[0], y.shape[1]))
+
+    # Define the LSTM model for sequential pattern prediction
+    lstm_model = Sequential([
+        LSTM(64, return_sequences=True, input_shape=(X.shape[1], 1)),  # First LSTM layer
+        LSTM(32, return_sequences=False),  # Second LSTM layer
+        Dense(y.shape[1])  # Fully connected output layer (same shape as target)
+    ])
+
+    lstm_model.compile(optimizer='adam', loss='mse')  # Compile the model with Mean Squared Error loss
+
+    # ✅ Ensure at least 1 training step exists before fitting
+    if len(X) > 0 and len(y) > 0:
         lstm_model.fit(X, y, epochs=15, batch_size=1, verbose=1)
+    else:
+        print(f"⚠️ Skipping LSTM training for {user_id} (Not enough training samples)")
+        lstm_model = None  # Avoid training on empty data
 
-        # Store trained models & history for this user
-        user_history[user_id] = {
-            "hmm_model": hmm_model,  # Store trained HMM model
-            "lstm_model": lstm_model,  # Store trained LSTM model
-            "history_data": group,  # Store user's login data
-            "hidden_states": hidden_states  # Store predicted HMM states
-        }
+    # Store trained models & history for this user
+    user_history[user_id] = {
+        "hmm_model": hmm_model,  # Store trained HMM model
+        "lstm_model": lstm_model,  # Store trained LSTM model
+        "history_data": group,  # Store user's login data
+        "hidden_states": hidden_states  # Store predicted HMM states
+    }
 
     return user_history  # Pass user history to the next model in the pipeline
 
