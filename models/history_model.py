@@ -1,9 +1,32 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
 from hmmlearn import hmm
 from tensorflow.keras.models import Sequential #type: ignore
 from tensorflow.keras.layers import LSTM, Dense #type: ignore
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+
+def adjust_event_time(event_time, timezone_offset):
+    """
+    Adjusts the hour in EVENT_TIME based on the TIMEZONE value.
+
+    Parameters:
+        event_time (str): Original event time in format '%d%m%Y%H:%M:%S'.
+        timezone_offset (int): The timezone offset to adjust the hour.
+
+    Returns:
+        str: The corrected event time in the original format.
+    """
+    try:
+        # Convert string to datetime object
+        dt = datetime.strptime(event_time, "%d%m%Y%H:%M:%S")
+        # Adjust the hour based on timezone
+        dt = dt - timedelta(hours=timezone_offset)
+        # Convert back to string in original format
+        return dt.strftime("%d%m%Y%H:%M:%S")
+    except Exception as e:
+        print(f"Error processing time {event_time}: {e}")
+        return event_time  # Return original if error occurs
 
 def build_user_history(csv_path):
     """
@@ -26,14 +49,16 @@ def build_user_history(csv_path):
 
     df = df[['USER_ID'] + features]  # Keep USER_ID as anchor
 
-    # Convert TIMEZONE column to numeric (ensure it's an integer)
+    # Ensure TIMEZONE is numeric (replace NaN with 0)
     df['TIMEZONE'] = pd.to_numeric(df['TIMEZONE'], errors='coerce').fillna(0).astype(int)
 
-    # Convert EVENT_TIME to numeric and adjust based on TIMEZONE
-    df['EVENT_TIME'] = pd.to_numeric(df['EVENT_TIME'], errors='coerce').fillna(0)
-    df['EVENT_TIME'] = df['EVENT_TIME'] + df['TIMEZONE']  # Adjust based on timezone
+    # Apply timezone adjustment to EVENT_TIME
+    df['EVENT_TIME'] = df.apply(lambda row: adjust_event_time(str(row['EVENT_TIME']), row['TIMEZONE']), axis=1)
 
-    # Encode categorical data (USER_NAME, DATA_S_1, IP_ADDRESS, IP_CITY, TIMEZONE, DATA_S_34)
+    # Convert EVENT_TIME back to numeric timestamp for modeling
+    df['EVENT_TIME'] = df['EVENT_TIME'].apply(lambda x: datetime.strptime(x, "%d%m%Y%H:%M:%S").timestamp())
+
+    # Encode categorical data (USER_NAME, DATA_S_1, IP_ADDRESS, IP_CITY, DATA_S_34)
     label_encoders = {}
     for col in ['USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'DATA_S_34']:
         le = LabelEncoder()
