@@ -72,9 +72,6 @@ def build_user_history(csv_path):
     # ✅ Adjust EVENT_TIME by subtracting the TIMEZONE offset from the hour
     df['EVENT_TIME'] = df.apply(lambda row: parse_event_time(str(row['EVENT_TIME']), row['TIMEZONE']), axis=1)
 
-    # ✅ Ensure EVENT_TIME is kept in its original 'DDMMMYYYY:HH:MM:SS' format
-    df['EVENT_TIME'] = df['EVENT_TIME'].apply(parse_event_time)
-
     # ✅ Ensure DATA_S_4 is an integer (device age)
     df['DATA_S_4'] = pd.to_numeric(df['DATA_S_4'], errors='coerce').fillna(0).astype(int)
 
