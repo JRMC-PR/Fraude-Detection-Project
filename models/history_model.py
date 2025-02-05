@@ -9,6 +9,8 @@ def build_user_history(csv_path):
     """
     Reads CSV and builds a historical profile for each USER_ID using HMM and LSTM.
 
+    Adjusts EVENT_TIME based on TIMEZONE.
+
     Parameters:
         csv_path (str): Path to the CSV file.
 
@@ -24,9 +26,16 @@ def build_user_history(csv_path):
 
     df = df[['USER_ID'] + features]  # Keep USER_ID as anchor
 
+    # Convert TIMEZONE column to numeric (ensure it's an integer)
+    df['TIMEZONE'] = pd.to_numeric(df['TIMEZONE'], errors='coerce').fillna(0).astype(int)
+
+    # Convert EVENT_TIME to numeric and adjust based on TIMEZONE
+    df['EVENT_TIME'] = pd.to_numeric(df['EVENT_TIME'], errors='coerce').fillna(0)
+    df['EVENT_TIME'] = df['EVENT_TIME'] + df['TIMEZONE']  # Adjust based on timezone
+
     # Encode categorical data (USER_NAME, DATA_S_1, IP_ADDRESS, IP_CITY, TIMEZONE, DATA_S_34)
     label_encoders = {}
-    for col in ['USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'TIMEZONE', 'DATA_S_34']:
+    for col in ['USER_NAME', 'DATA_S_1', 'IP_ADDRESS', 'IP_CITY', 'DATA_S_34']:
         le = LabelEncoder()
         df[col] = le.fit_transform(df[col])
         label_encoders[col] = le  # Store encoders for future use
