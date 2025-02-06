@@ -2,10 +2,33 @@ import pandas as pd
 import numpy as np
 import hdbscan
 import re
+import pickle
 from datetime import datetime
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
 
+# 📌 Function to load user history from a .pkl file
+def load_user_history(pickle_path):
+    """
+    Loads user history from a pickle (.pkl) file.
+
+    Parameters:
+        pickle_path (str): Path to the user history pickle file.
+
+    Returns:
+        dict: Loaded user history data.
+    """
+    try:
+        with open(pickle_path, "rb") as file:
+            return pickle.load(file)  # Load user history dictionary
+    except FileNotFoundError:
+        print(f"\n❌ Error: File '{pickle_path}' not found.")
+        return {}
+    except Exception as e:
+        print(f"\n❌ Error loading pickle file: {e}")
+        return {}
+
+# 📌 Function to extract numbers from a username
 def extract_numbers_and_clean(username):
     """
     Extracts numerical values from a username and returns the cleaned username.
@@ -20,19 +43,26 @@ def extract_numbers_and_clean(username):
     cleaned_id = re.sub(r'\d+', '', username)  # Remove numbers from username
     return cleaned_id, numbers
 
-def run_fraud_detection(auth_path, user_history):
+# 📌 Main fraud detection function
+def run_fraud_detection(auth_path, user_history_path):
     """
     Detects fraud patterns in login attempts using HDBSCAN & Isolation Forest.
 
     Parameters:
         auth_path (str): Path to the authentication log file (AUTH.csv).
-        user_history (dict): Output from the user history model containing user profiles.
+        user_history_path (str): Path to the user history pickle file.
 
     Saves:
         - processed_login_attempts.csv (Preprocessed login data)
         - detected_anomalies.csv (Flagged anomalies)
     """
     try:
+        # Load user history from pickle file
+        user_history = load_user_history(user_history_path)
+        if not user_history:
+            print("\n❌ No user history found. Exiting fraud detection.")
+            return
+
         # Load authentication log
         df_auth = pd.read_csv(auth_path)
 
@@ -42,7 +72,7 @@ def run_fraud_detection(auth_path, user_history):
             raise ValueError(f"CSV file must contain columns: {required_columns}")
 
         # Convert EVENT_DATE to datetime format
-        df_auth["EVENT_DATE"] = pd.to_datetime(df_auth["EVENT_DATE"], format="%d%b%Y:%H:%M:%S")
+        df_auth["EVENT_DATE"] = pd.to_datetime(df_auth["EVENT_DATE"], format="%d%m%y%H:%M:%S")
 
         # Extract numbers from USERNAME for anomaly detection
         df_auth["CLEANED_USERNAME"], df_auth["EXTRACTED_NUMBERS"] = zip(*df_auth["USERNAME"].apply(extract_numbers_and_clean))
@@ -122,10 +152,9 @@ def run_fraud_detection(auth_path, user_history):
     except Exception as e:
         print(f"\n❌ Unexpected error: {str(e)}")
 
-# Example usage:
+# 📌 Example usage
 auth_path = "/home/vaiosos/Documents/Holberton/Fraude-Detection-Project/Data/fake_auth_dataset.csv"
-user_history = {
-    "johndoe123": {"history_data": "User's history here"},
-    "janesmith99": {"history_data": "User's history here"}
-}
-run_fraud_detection(auth_path, user_history)
+user_history_path = "/home/vaiosos/Documents/Holberton/Fraude-Detection-Project/Data/user_history.pkl"
+
+# Run fraud detection with dynamically loaded user history
+run_fraud_detection(auth_path, user_history_path)
