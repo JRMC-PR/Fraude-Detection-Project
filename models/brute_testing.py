@@ -6,6 +6,14 @@ import pickle
 from datetime import datetime
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
+import tensorflow as tf
+import os
+
+# Force TensorFlow to use CPU only
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+tf.config.set_visible_devices([], 'GPU')
+
+
 
 # 📌 Function to load user history from a .pkl file
 def load_user_history(pickle_path):
@@ -152,9 +160,4 @@ def run_fraud_detection(auth_path, user_history_path):
     except Exception as e:
         print(f"\n❌ Unexpected error: {str(e)}")
 
-# 📌 Example usage
-auth_path = "/home/vaiosos/Documents/Holberton/Fraude-Detection-Project/Data/fake_auth_dataset.csv"
-user_history_path = "/home/vaiosos/Documents/Holberton/Fraude-Detection-Project/Data/user_history.pkl"
 
-# Run fraud detection with dynamically loaded user history
-run_fraud_detection(auth_path, user_history_path)
