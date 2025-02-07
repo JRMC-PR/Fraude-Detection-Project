@@ -102,7 +102,7 @@ def main():
             continue
 
         display_menu()
-        choice = input("\nEnter your choice (1-2-0): ").strip()
+        choice = input("\nEnter your choice (1-0): ").strip()
 
         if choice == "1":
             print("\nRunning Fraud Detection Model...\n")
