@@ -16,7 +16,6 @@ def display_welcome():
 def display_menu():
     print("\nOptions:")
     print("1. Run Fraud Detection Model for numerical values")
-    print("2. Show Users With Less Than 3 Entries")
     print("0. Exit")
 
 def show_skipped_users():
