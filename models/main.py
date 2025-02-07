@@ -5,7 +5,7 @@ import pyfiglet
 import traceback  # For full error trace
 from model import run_fraud_detection  # Import the function from model.py
 import pickle
-from history_model_V2 import build_user_history
+from history_model import build_user_history
 
 # Function to display welcome message
 def display_welcome():
@@ -109,8 +109,10 @@ def main():
             time.sleep(2)
 
             try:
-                build_user_history(AUTH_PATH)  # Call the model function
-                print("\nDetection complete! Check REPORT.csv for results.\n")
+                build_user_history(RSA_PATH)  # Call the model function
+                print("\nDetection complete! Save user_history.pkl fedding into Brute force now.\n")
+                run_fraud_detection(AUTH_PATH, "/home/vaiosos/Documents/Holberton/Fraude-Detection-Project/models/user_history.pkl")  # Call the model function
+                print("\nDetection complete! Check detected_anomalies.csv for results. and processed_login_attempts.csv\n")
 
             except ValueError as e:
                 print("\n❌ **Data Processing Error** ❌")
@@ -133,9 +135,6 @@ def main():
                 print(f"   → {str(e)}\n")
                 print("🔎 **Full Traceback:**")
                 traceback.print_exc()
-
-        elif choice == "2":
-            show_skipped_users()
 
         elif choice == "0":
             print("\nExiting... Goodbye!")
