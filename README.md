@@ -8,11 +8,7 @@
 - [Usage](#usage)
 - [Data](#data)
 - [Model Description](#model-description)
-- [Evaluation Metrics](#evaluation-metrics)
 - [Results](#results)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 
 
