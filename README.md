@@ -17,112 +17,112 @@
 
 
 ## Introduction
-Fraud detection in banking is crucial for protecting customer assets and maintaining the trustworthiness of financial institutions. This project leverages machine learning techniques to identify potentially fraudulent transactions in real time.
+Fraud detection in banking is crucial for protecting customer assets and maintaining the trustworthiness of financial institutions. This project leverages machine learning techniques to identify potentially fraudulent transactions.
 
 
 
 ## Features
-- Real-time transaction monitoring
-- Machine learning-based fraud detection
-- Model performance evaluation with metrics like precision, recall, and F1-score
-- Visualization of key insights and transaction patterns
+- Creater user history using machine learning
+- Detect fraudulent activities susch as:
+  - Modifications in accounts credentials
+  - Multiple accounts triyin gto lig in from the same place
+  - Brute froece changing numerical value of user name
+  - Multiple log in attems in a short time frame
 
 
 
 ## Technologies Used
 - **Programming Language**: Python
-- **Libraries**: NumPy, Pandas, Scikit-learn, TensorFlow/Keras, Matplotlib, Seaborn
-- **Database**: MySQL / PostgreSQL (or other DBMS)
-- **Visualization**: Tableau, Power BI, or Python-based tools
-- **Framework**: Flask/Django for web deployment (optional)
+- **Libraries**: NumPy, Pandas, Scikit-learn, TensorFlow/Keras, Matplotlib
+- **Database**:  SAS
+- **Files**: CSV
 
 
 
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/fraud-detection.git
+   git clone git@github.com:JRMC-PR/Fraude-Detection-Project.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd fraud-detection
+   cd Fraude-Detection-Project
    ```
 3. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   Python
+   pip
+   pyfiglet
+   pandas
+   numpy
+   hmmlearn
+   tensorflow
+   hdbscan
+   scikit-learn
    ```
-4. Set up the database:
-   - Import the provided SQL schema or setup instructions from the `/database` folder.
-
-
 
 ## Usage
-1. Run the pre-processing script to prepare the data:
-   ```bash
-   python preprocess_data.py
+1. Download the data sets of the RSA and Costumer AUTH from SAS And placed them in the respecting folders:
+   ```
+   EX. Data/Raw_Data/RSA_DATA/Agosto_1_2024.csv
+   Ex. Data/Raw_Data/AUTH_DATA/Agosto_1_2024.csv
+
    ```
 2. Train the model:
-   ```bash
-   python train_model.py
    ```
-3. Evaluate the model:
-   ```bash
-   python evaluate_model.py
-   ```
-4. (Optional) Deploy the application for real-time detection:
-   ```bash
-   python app.py
-   ```
+   Run the main file located in the models folder in the
+   projects working tree
 
+   python3 main.py
+
+   And enter the file names for ther RSA and AUTH data sets
+   ```
 
 
 ## Data
 The dataset includes information on financial transactions, including:
-- Transaction amount
-- Transaction time
-- Source and destination account details
-- Transaction type (e.g., withdrawal, deposit)
-- Labels indicating whether a transaction is fraudulent or legitimate
+- **RSA**:
+- **'USER_ID**
+- **USER_NAME**
+- **DATA_S_**
+- **IP_ADDRESS**
+- **IP_CITY**
+- **TIMEZONE**
+- **EVENT_TIME**
+- **DATA_S_4**
+- **DATA_S_34**
+- **RISK_SCORE**
+- **EVENT_TYPE**
+
+- **AUTH**:
+- **ID**
+- **PROFILE_ID**
+- **EVENT_DATE**
+- **USERNAME**
+- **EVENT**
+- **IP**
+- **SESSIONID**
+- **SEVERITY**
+- **SERVER**
+- **TRACE**
+- **REPORT_DATE**
+- **LOAD_DATE**
+
 
 *Note*: Ensure data privacy by anonymizing sensitive information and adhering to GDPR or other relevant regulations.
 
 
 
 ## Model Description
-- **Algorithm**: Random Forest, Gradient Boosting, Neural Networks, or a combination
-- **Feature Engineering**: Statistical analysis, feature scaling, and encoding
-- **Pipeline**: Data preprocessing → Feature extraction → Model training → Evaluation
-
-
-
-## Evaluation Metrics
-- **Accuracy**
-- **Precision**
-- **Recall**
-- **F1-score**
-- **ROC-AUC**
+- **Algorithm**:
+   - **Histopry model**: Hmm and LSTM
+- **Brute Force**: HDBSCAN and Isolation Forest
 
 
 ## Results
-Include a summary of the results:
-- Confusion matrix
-- ROC curve
-- Performance metrics comparison
+    In conclusion, we where not able to complete the intere propject do to insufficent data analisys, multiple restrictions from the bank and the lack of time to complete the project. We where able to create a model that can detect multiple log in attemps in a short time frame and brute force attacks. multiple log in attemps in a short time frame and brute force attacks. multiple logins from the same Ip and a History model that builds a user history to detect anomalies in the user behavior.
 
-
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request for review.
-
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
-## Acknowledgements
-- [Kaggle](https://www.kaggle.com/) for the datasets
-- Open-source contributors for libraries and frameworks
-- Mentors and colleagues for guidance
-
+    We are still missing the implementations of the Risk scoring model and fine tunning th eprev 2 models made
 
 
 ## Authors Information
@@ -132,7 +132,6 @@ This project was developed by;
 
    ### Contact
 - **Email**: [juansilva.dvm@gmail.com](mailto:juansilva.dvm@gmail.com)
-- **LinkedIn**: [linkedin.com/in/juan-silva-rubio)](https://linkedin.com/in/juan-silva-rubio)
 - **GitHub**: [github.com/Mizuinu30](https://github.com/Mizuinu30)
 
     In colaboration with:
@@ -141,30 +140,26 @@ This project was developed by;
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+- **GitHub**: [github.com/JRMC-PR](https://github.com/JRMC-PR)
 
 
 
     - Hector J Vasquez (lor at  ipsum astra)
 
     ### Contact
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+- **Email**: [jjvazquez96@gmail.com](mailto:jjvazquez96@gmail.com)
+- **GitHub**: [github.com/pepesaur96](https://github.com/pepesaur96)
 
 
     - Juan C Rodriguez(lores ipsum dolor sit amet)
 
     ### Contact
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+- **Email**: [Juancarlos-99@live.com](mailto:Juancarlos-99@live.com)
+- **GitHub**: [github.com/JCRoooD](https://github.com/JCRoooD)
 
     - Guillermo Pereyo(lores ipsum)
     ### Contact
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+- **Email**: [gpereyo@gmail.com.com](mailto:gpereyo@gmail.com.com)
+- **GitHub**: [github.com/GuilleP2018](https://github.com/GuilleP2018)
 
 
