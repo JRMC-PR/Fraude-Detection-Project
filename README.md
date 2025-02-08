@@ -132,7 +132,7 @@ This project was developed by;
 
     In colaboration with:
 
-    - Jesus R Mendez(Ipsum Lorem et)
+    - Jesus R Mendez
 
     ### Contact
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
@@ -140,20 +140,20 @@ This project was developed by;
 
 
 
-    - Hector J Vasquez (lor at  ipsum astra)
+    - Hector J Vasquez
 
     ### Contact
 - **Email**: [jjvazquez96@gmail.com](mailto:jjvazquez96@gmail.com)
 - **GitHub**: [github.com/pepesaur96](https://github.com/pepesaur96)
 
 
-    - Juan C Rodriguez(lores ipsum dolor sit amet)
+    - Juan C Rodriguez
 
     ### Contact
 - **Email**: [Juancarlos-99@live.com](mailto:Juancarlos-99@live.com)
 - **GitHub**: [github.com/JCRoooD](https://github.com/JCRoooD)
 
-    - Guillermo Pereyo(lores ipsum)
+    - Guillermo Pereyo
     ### Contact
 - **Email**: [gpereyo@gmail.com.com](mailto:gpereyo@gmail.com.com)
 - **GitHub**: [github.com/GuilleP2018](https://github.com/GuilleP2018)
